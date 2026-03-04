@@ -1,4 +1,6 @@
-# Welcome to your Lovable project
+
+## Quiz Platform - Multi-topic Quiz Application SCRUM-3
+#welcome to your Lovable project
 
 ## Project info
 
