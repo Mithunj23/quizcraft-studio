@@ -60,8 +60,8 @@ const Index = () => {
             className="flex items-center justify-center gap-8 mt-10"
           >
             {[
-              { icon: Brain, label: "Questions", value: "24+" },
-              { icon: Trophy, label: "Categories", value: "3" },
+              { icon: Brain, label: "Questions", value: "120" },
+              { icon: Trophy, label: "Categories", value: "8" },
               { icon: Clock, label: "Avg Time", value: "5min" },
             ].map((stat) => (
               <div key={stat.label} className="flex flex-col items-center gap-1">
@@ -74,7 +74,7 @@ const Index = () => {
         </motion.div>
 
         {/* Quiz Cards */}
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {quizzes.map((quiz, i) => (
             <motion.div
               key={quiz.id}
