@@ -1,16 +1,52 @@
 import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { quizzes } from "@/data/quizData";
-import { Trophy, RotateCcw, Home, Star, Target, Zap } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { Trophy, RotateCcw, Home, Star, Target, Zap, BarChart3 } from "lucide-react";
 
 const ResultsPage = () => {
   const { quizId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
+  const { user } = useAuth();
   const quiz = quizzes.find((q) => q.id === quizId);
-  const { score = 0, total = 0, streak = 0 } = (location.state as any) || {};
+  const { score = 0, total = 0, streak = 0, answers = [] } = (location.state as any) || {};
+  const [saved, setSaved] = useState(false);
 
   const percentage = total > 0 ? Math.round((score / total) * 100) : 0;
+
+  // Save to database
+  useEffect(() => {
+    if (!user || saved || total === 0) return;
+    const save = async () => {
+      // Find category - try to match quiz title to a category
+      const { data: categories } = await supabase
+        .from("categories")
+        .select("id, name");
+      
+      let categoryId: string | null = null;
+      if (categories && quiz) {
+        const match = categories.find(c => c.name.toLowerCase() === quiz.title.toLowerCase());
+        if (match) categoryId = match.id;
+      }
+
+      if (categoryId) {
+        await supabase.from("quiz_attempts").insert({
+          user_id: user.id,
+          category_id: categoryId,
+          score,
+          total_questions: total,
+          accuracy: percentage,
+          best_streak: streak,
+          answers: answers,
+        });
+      }
+      setSaved(true);
+    };
+    save();
+  }, [user, saved]);
 
   const getMessage = () => {
     if (percentage === 100) return { text: "Perfect Score!", emoji: "🏆", color: "text-warning" };
@@ -33,7 +69,6 @@ const ResultsPage = () => {
         className="relative z-10 max-w-md w-full mx-6"
       >
         <div className="rounded-2xl border-2 border-border bg-card p-8 text-center">
-          {/* Emoji */}
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
@@ -46,7 +81,6 @@ const ResultsPage = () => {
           <h1 className={`text-3xl font-bold mb-2 ${msg.color}`}>{msg.text}</h1>
           <p className="text-muted-foreground mb-8">{quiz?.title || "Quiz"} completed</p>
 
-          {/* Score circle */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -72,7 +106,6 @@ const ResultsPage = () => {
             </div>
           </motion.div>
 
-          {/* Stats */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -92,7 +125,6 @@ const ResultsPage = () => {
             ))}
           </motion.div>
 
-          {/* Actions */}
           <div className="flex gap-3">
             <button
               onClick={() => navigate(`/quiz/${quizId}`)}
@@ -102,13 +134,21 @@ const ResultsPage = () => {
               Retry
             </button>
             <button
-              onClick={() => navigate("/")}
+              onClick={() => navigate("/dashboard")}
               className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-primary text-primary-foreground font-semibold hover:opacity-90 transition-opacity"
             >
-              <Home className="w-4 h-4" />
-              Home
+              <BarChart3 className="w-4 h-4" />
+              Dashboard
             </button>
           </div>
+
+          <button
+            onClick={() => navigate("/")}
+            className="mt-3 w-full flex items-center justify-center gap-2 px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <Home className="w-4 h-4" />
+            Back to Home
+          </button>
         </div>
       </motion.div>
     </div>

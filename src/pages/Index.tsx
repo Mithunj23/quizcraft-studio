@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { quizzes } from "@/data/quizData";
 import { Zap, ArrowRight, Brain, Trophy, Clock } from "lucide-react";
+import Header from "@/components/Header";
 
 const colorMap = {
   primary: "border-primary/30 hover:border-primary/60 hover:glow-primary",
@@ -22,7 +23,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background bg-grid relative overflow-hidden">
-      {/* Ambient glow */}
+      <Header />
       <div className="fixed top-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full bg-primary/5 blur-[120px] pointer-events-none" />
       <div className="fixed bottom-[-20%] right-[-10%] w-[500px] h-[500px] rounded-full bg-accent/5 blur-[120px] pointer-events-none" />
 
@@ -52,7 +53,6 @@ const Index = () => {
             Challenge yourself with beautifully crafted quizzes. Track your progress, beat the clock, and climb the ranks.
           </p>
 
-          {/* Stats */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
