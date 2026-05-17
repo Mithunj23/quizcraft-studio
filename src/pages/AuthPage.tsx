@@ -37,8 +37,8 @@ const AuthPage = () => {
       if (error) {
         toast({ title: "Signup failed", description: error.message, variant: "destructive" });
       } else {
-        toast({ title: "Account created!", description: "Please check your email to verify your account." });
-        setIsLogin(true);
+        toast({ title: "Account created!", description: "You're signed in." });
+        navigate("/");
       }
     }
     setLoading(false);
